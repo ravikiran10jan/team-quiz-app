@@ -64,17 +64,16 @@ export default function AdminDashboard() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "active": return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-      case "finished": return "bg-zinc-800 text-zinc-400 border border-zinc-700";
-      default: return "bg-zinc-800 text-zinc-400 border border-zinc-700";
+      case "active": return "bg-correct/10 text-correct border border-correct/20";
+      default: return "bg-surface-overlay text-text-muted border border-white/[0.06]";
     }
   };
 
   return (
     <div className="flex-1 p-6 max-w-4xl mx-auto w-full">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
-        <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
+        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
+        <Link href="/" className="text-text-muted hover:text-text-primary text-sm transition-colors">
           &larr; Home
         </Link>
       </div>
@@ -82,7 +81,7 @@ export default function AdminDashboard() {
       {/* Create new quiz */}
       <form
         onSubmit={handleCreate}
-        className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-8"
+        className="card p-6 mb-8"
       >
         <h2 className="text-lg font-medium mb-4">Create New Quiz</h2>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -91,14 +90,14 @@ export default function AdminDashboard() {
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             placeholder="Quiz title..."
-            className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 transition-colors"
+            className="flex-1 px-4 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-colors"
           />
           <div className="flex items-center gap-2">
-            <label className="text-sm text-zinc-400 whitespace-nowrap">Time/Q:</label>
+            <label className="text-sm text-text-secondary whitespace-nowrap">Time/Q:</label>
             <select
               value={timePerQ}
               onChange={(e) => setTimePerQ(Number(e.target.value))}
-              className="px-3 py-3 bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+              className="px-3 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors"
             >
               <option value={10}>10s</option>
               <option value={15}>15s</option>
@@ -111,7 +110,7 @@ export default function AdminDashboard() {
           <button
             type="submit"
             disabled={creating || !newTitle.trim()}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="px-6 py-3 bg-accent hover:bg-accent-hover text-white font-medium rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
           >
             + Create
           </button>
@@ -121,14 +120,14 @@ export default function AdminDashboard() {
       {/* Quiz list */}
       <div className="space-y-3">
         {quizzes.length === 0 ? (
-          <div className="text-center py-12 text-zinc-500">
+          <div className="text-center py-12 text-text-muted">
             <p>No quizzes yet. Create one above!</p>
           </div>
         ) : (
           quizzes.map((quiz) => (
             <div
               key={quiz.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+              className="card p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
@@ -137,9 +136,9 @@ export default function AdminDashboard() {
                     {quiz.status}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-zinc-400">
+                <div className="flex items-center gap-4 text-sm text-text-secondary">
                   <span>
-                    Code: <span className="font-mono text-indigo-400 font-medium">{quiz.code}</span>
+                    Code: <span className="font-mono text-accent font-medium">{quiz.code}</span>
                   </span>
                   <span>{quiz.timePerQuestion}s per question</span>
                 </div>
@@ -148,19 +147,19 @@ export default function AdminDashboard() {
               <div className="flex gap-2 shrink-0">
                 <button
                   onClick={() => router.push(`/admin/quiz/${quiz.id}`)}
-                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 bg-surface-overlay hover:bg-white/[0.08] border border-white/[0.06] rounded-lg text-sm font-medium transition-colors"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => router.push(`/admin/quiz/${quiz.id}/control`)}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 bg-accent hover:bg-accent-hover rounded-lg text-sm font-medium transition-colors"
                 >
                   Control
                 </button>
                 <button
                   onClick={() => handleDelete(quiz.id)}
-                  className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-sm font-medium transition-colors text-rose-400"
+                  className="px-4 py-2 bg-wrong/10 hover:bg-wrong/15 border border-wrong/20 rounded-lg text-sm font-medium transition-colors text-wrong"
                 >
                   Delete
                 </button>

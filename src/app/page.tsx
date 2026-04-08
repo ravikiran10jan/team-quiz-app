@@ -40,15 +40,15 @@ export default function HomePage() {
     <div className="flex-1 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">
+          <h1 className="text-3xl font-semibold text-text-primary">
             Quiz Battle
           </h1>
-          <p className="text-zinc-400 text-sm mt-2">Enter your name and quiz code to join</p>
+          <p className="text-text-secondary text-sm mt-2">Enter your name and quiz code to join</p>
         </div>
 
         <form onSubmit={handleJoin} className="space-y-4">
           <div>
-            <label htmlFor="playerName" className="block text-sm font-medium text-zinc-400 mb-1">
+            <label htmlFor="playerName" className="block text-sm font-medium text-text-secondary mb-1">
               Your Name
             </label>
             <input
@@ -59,12 +59,12 @@ export default function HomePage() {
               placeholder="Enter your name"
               maxLength={30}
               required
-              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 text-lg transition-colors"
+              className="w-full px-4 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 text-lg transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="code" className="block text-sm font-medium text-zinc-400 mb-1">
+            <label htmlFor="code" className="block text-sm font-medium text-text-secondary mb-1">
               Quiz Code
             </label>
             <input
@@ -75,12 +75,12 @@ export default function HomePage() {
               placeholder="QUIZ7K"
               maxLength={6}
               required
-              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 text-lg tracking-[0.3em] text-center font-mono uppercase transition-colors"
+              className="w-full px-4 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 text-lg tracking-[0.3em] text-center font-mono uppercase transition-colors"
             />
           </div>
 
           {error && (
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-wrong/10 border border-wrong/20 text-wrong px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -88,7 +88,7 @@ export default function HomePage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium text-lg rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+            className="w-full py-3 bg-accent hover:bg-accent-hover text-white font-medium text-lg rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Joining..." : "Join Quiz"}
           </button>
@@ -97,7 +97,7 @@ export default function HomePage() {
         <div className="mt-8 text-center">
           <a
             href="/admin"
-            className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+            className="text-text-muted hover:text-text-primary text-sm transition-colors"
           >
             Admin Access &rarr;
           </a>

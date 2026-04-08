@@ -39,8 +39,8 @@ export default function AdminLoginPage() {
     <div className="flex-1 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Admin Access</h1>
-          <p className="text-zinc-400 text-sm mt-1">Enter admin password to continue</p>
+          <h1 className="text-xl font-semibold text-text-primary">Admin Access</h1>
+          <p className="text-text-secondary text-sm mt-1">Enter admin password to continue</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -50,11 +50,11 @@ export default function AdminLoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             required
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 transition-colors"
+            className="w-full px-4 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-colors"
           />
 
           {error && (
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-wrong/10 border border-wrong/20 text-wrong px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -62,14 +62,14 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+            className="w-full py-3 bg-accent hover:bg-accent-hover text-white font-medium rounded-lg transition-colors disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
+          <Link href="/" className="text-text-muted hover:text-text-primary text-sm transition-colors">
             &larr; Back to Home
           </Link>
         </div>

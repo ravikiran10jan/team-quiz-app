@@ -2,14 +2,37 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
-  --color-primary: #4f46e5;
-  --color-primary-light: #6366f1;
-  --color-success: #34d399;
-  --color-danger: #fb7185;
+  /* Surfaces */
+  --color-surface-base: #0c0d14;
+  --color-surface-raised: #151621;
+  --color-surface-overlay: #1c1d2e;
+  /* Text */
+  --color-text-primary: #ededf0;
+  --color-text-secondary: #8b8d9e;
+  --color-text-muted: #53556a;
+  /* Accent */
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+  /* Answer options */
+  --color-option-a: #3b82f6;
+  --color-option-b: #22c55e;
+  --color-option-c: #f97316;
+  --color-option-d: #ec4899;
+  /* States */
+  --color-correct: #34d399;
+  --color-wrong: #f87171;
+  --color-warning: #fbbf24;
 }
 
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.card {
+  background: var(--color-surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
 }
 
 /* Confetti keyframes */

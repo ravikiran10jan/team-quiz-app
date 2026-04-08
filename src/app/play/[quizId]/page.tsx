@@ -6,6 +6,14 @@ import { useQuizSSE } from "@/hooks/use-quiz-sse";
 import { useQuizStore } from "@/stores/quiz-store";
 import { useCountdown } from "@/hooks/use-countdown";
 
+// ─── Option Color Themes (Kahoot-style per-option) ───
+const OPTION_THEMES = [
+  { bg: "bg-option-a/8", border: "border-option-a/20", hoverBorder: "hover:border-option-a/40", selectedBg: "bg-option-a/15", selectedBorder: "border-option-a/50", ring: "ring-option-a/20", badgeBg: "bg-option-a/20", badgeText: "text-option-a" },
+  { bg: "bg-option-b/8", border: "border-option-b/20", hoverBorder: "hover:border-option-b/40", selectedBg: "bg-option-b/15", selectedBorder: "border-option-b/50", ring: "ring-option-b/20", badgeBg: "bg-option-b/20", badgeText: "text-option-b" },
+  { bg: "bg-option-c/8", border: "border-option-c/20", hoverBorder: "hover:border-option-c/40", selectedBg: "bg-option-c/15", selectedBorder: "border-option-c/50", ring: "ring-option-c/20", badgeBg: "bg-option-c/20", badgeText: "text-option-c" },
+  { bg: "bg-option-d/8", border: "border-option-d/20", hoverBorder: "hover:border-option-d/40", selectedBg: "bg-option-d/15", selectedBorder: "border-option-d/50", ring: "ring-option-d/20", badgeBg: "bg-option-d/20", badgeText: "text-option-d" },
+];
+
 // ─── Confetti Component ───
 function ConfettiExplosion() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -76,12 +84,12 @@ function TimerRing({ fraction, timeLeft }: { fraction: number; timeLeft: number 
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - fraction);
   const color =
-    fraction > 0.5 ? "text-zinc-300" : fraction > 0.2 ? "text-amber-400" : "text-rose-400";
+    fraction > 0.5 ? "text-text-primary" : fraction > 0.2 ? "text-warning" : "text-wrong";
 
   return (
     <div className="relative flex items-center justify-center">
       <svg width="88" height="88" className="-rotate-90">
-        <circle cx="44" cy="44" r={radius} fill="none" stroke="#27272a" strokeWidth="6" />
+        <circle cx="44" cy="44" r={radius} fill="none" stroke="var(--color-surface-overlay)" strokeWidth="6" />
         <circle
           cx="44"
           cy="44"
@@ -92,7 +100,7 @@ function TimerRing({ fraction, timeLeft }: { fraction: number; timeLeft: number 
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className={`${color} transition-all duration-100`}
+          className={`${color} transition-[stroke-dashoffset] duration-100`}
         />
       </svg>
       <span className={`absolute text-2xl font-bold ${color}`}>{timeLeft}</span>
@@ -104,8 +112,8 @@ function TimerRing({ fraction, timeLeft }: { fraction: number; timeLeft: number 
 function StreakBadge({ streak }: { streak: number }) {
   if (streak < 2) return null;
   return (
-    <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full">
-      <span className="text-amber-400 font-medium text-sm">&times;{streak} streak</span>
+    <div className="inline-flex items-center gap-1 px-3 py-1 bg-warning/10 border border-warning/20 rounded-full">
+      <span className="text-warning font-medium text-sm">&times;{streak} streak</span>
     </div>
   );
 }
@@ -114,20 +122,20 @@ function StreakBadge({ streak }: { streak: number }) {
 function LobbyView({ playerName, playerCount, quizTitle }: { playerName: string; playerCount: number; quizTitle: string }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 mb-2">{quizTitle}</h1>
-      <p className="text-zinc-400 text-sm mb-8">Waiting for the host to start...</p>
+      <h1 className="text-2xl font-semibold text-text-primary mb-2">{quizTitle}</h1>
+      <p className="text-text-secondary text-sm mb-8">Waiting for the host to start...</p>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-4 w-full max-w-sm">
-        <p className="text-zinc-500 text-xs uppercase tracking-wide">You</p>
-        <p className="text-xl font-semibold text-indigo-400">{playerName}</p>
+      <div className="card p-6 mb-4 w-full max-w-sm">
+        <p className="text-text-muted text-xs uppercase tracking-wide">You</p>
+        <p className="text-xl font-semibold text-accent">{playerName}</p>
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 w-full max-w-sm">
-        <p className="text-zinc-500 text-xs uppercase tracking-wide">Players Joined</p>
-        <p className="text-3xl font-bold text-zinc-50">{playerCount}</p>
+      <div className="card p-6 w-full max-w-sm">
+        <p className="text-text-muted text-xs uppercase tracking-wide">Players Joined</p>
+        <p className="text-3xl font-bold text-text-primary">{playerCount}</p>
       </div>
 
-      <span className="mt-8 text-zinc-500 text-sm animate-pulse">Waiting for host to start...</span>
+      <span className="mt-8 text-text-muted text-sm animate-pulse">Waiting for host to start...</span>
     </div>
   );
 }
@@ -192,38 +200,43 @@ function QuestionView() {
 
   if (!currentQuestion) return null;
 
-  const getOptionStyle = (optionId: string) => {
+  const getOptionStyle = (optionId: string, idx: number) => {
+    const theme = OPTION_THEMES[idx % 4];
+
     // Revealed state
     if (feedback || correctOptionId) {
       if (optionId === (feedback?.correctOptionId ?? correctOptionId)) {
-        return "bg-emerald-500/10 border-emerald-500 text-emerald-300";
+        return "bg-correct/15 border-correct text-correct";
       }
       if (optionId === selectedOptionId && !feedback?.correct) {
-        return "bg-rose-500/10 border-rose-500/50 text-zinc-400 animate-shake";
+        return "bg-wrong/10 border-wrong/40 text-text-secondary animate-shake";
       }
-      return "bg-zinc-800/80 border-zinc-800 opacity-40";
+      return "bg-surface-overlay border-transparent opacity-30";
     }
     // Selected (pre-reveal)
     if (optionId === selectedOptionId) {
-      return "bg-indigo-500/10 border-indigo-500/50 text-zinc-100";
+      return `${theme.selectedBg} ${theme.selectedBorder} ring-2 ${theme.ring} text-text-primary`;
     }
-    // Default
-    return "bg-zinc-800/80 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-100";
+    // Default — each option has its own color
+    return `${theme.bg} ${theme.border} ${theme.hoverBorder} text-text-primary`;
   };
 
-  const getBadgeStyle = (optionId: string) => {
+  const getBadgeStyle = (optionId: string, idx: number) => {
+    const theme = OPTION_THEMES[idx % 4];
+
     if (feedback || correctOptionId) {
       if (optionId === (feedback?.correctOptionId ?? correctOptionId)) {
-        return "bg-emerald-500/20 text-emerald-400";
+        return "bg-correct/20 text-correct";
       }
       if (optionId === selectedOptionId && !feedback?.correct) {
-        return "bg-rose-500/20 text-rose-400";
+        return "bg-wrong/20 text-wrong";
       }
+      return "bg-surface-overlay text-text-muted";
     }
     if (optionId === selectedOptionId) {
-      return "bg-indigo-500/20 text-indigo-400";
+      return `${theme.badgeBg} ${theme.badgeText}`;
     }
-    return "bg-zinc-700 text-zinc-400";
+    return `${theme.badgeBg} ${theme.badgeText}`;
   };
 
   return (
@@ -233,22 +246,22 @@ function QuestionView() {
       {/* Header: score, streak, timer */}
       <div className="flex items-center justify-between mb-4">
         <div className="text-left">
-          <div className="text-xs text-zinc-500 uppercase tracking-wide">Score</div>
-          <div className="text-lg font-semibold text-zinc-50">{totalScore.toLocaleString()}</div>
+          <div className="text-xs text-text-muted uppercase tracking-wide">Score</div>
+          <div className="text-lg font-semibold text-text-primary">{totalScore.toLocaleString()}</div>
         </div>
         <TimerRing fraction={fraction} timeLeft={timeLeft} />
         <div className="text-right">
           <StreakBadge streak={streak} />
-          <div className="text-sm text-zinc-400 mt-1">
+          <div className="text-sm text-text-secondary mt-1">
             Q{currentQuestion.questionIdx + 1}/{currentQuestion.totalQuestions}
           </div>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-zinc-800 rounded-full mb-6 overflow-hidden">
+      <div className="h-1 bg-surface-overlay rounded-full mb-6 overflow-hidden">
         <div
-          className="h-full bg-indigo-500 rounded-full transition-all duration-300"
+          className="h-full bg-accent rounded-full transition-[width] duration-300"
           style={{
             width: `${((currentQuestion.questionIdx + 1) / currentQuestion.totalQuestions) * 100}%`,
           }}
@@ -256,22 +269,22 @@ function QuestionView() {
       </div>
 
       {/* Question text */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-medium text-zinc-50 text-center leading-relaxed">
+      <div className="card p-6 mb-6">
+        <h2 className="text-lg font-medium text-text-primary text-center leading-relaxed">
           {currentQuestion.text}
         </h2>
       </div>
 
-      {/* Options */}
+      {/* Options — each with distinct color, fixed double-click */}
       <div className="grid grid-cols-1 gap-3 flex-1">
         {currentQuestion.options.map((opt, idx) => (
           <button
             key={opt.id}
             onClick={() => handleSelectOption(opt.id)}
-            disabled={!!selectedOptionId || !!feedback || isExpired}
-            className={`relative w-full py-4 px-5 rounded-xl text-left font-medium text-base border transition-all duration-150 active:scale-[0.98] disabled:cursor-default ${getOptionStyle(opt.id)}`}
+            disabled={!!selectedOptionId || !!feedback || isExpired || submitting}
+            className={`relative w-full py-4 px-5 rounded-xl text-left font-medium text-base border transition-colors duration-150 touch-manipulation disabled:cursor-default ${getOptionStyle(opt.id, idx)}`}
           >
-            <span className={`mr-3 inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-semibold ${getBadgeStyle(opt.id)}`}>
+            <span className={`mr-3 inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-semibold ${getBadgeStyle(opt.id, idx)}`}>
               {String.fromCharCode(65 + idx)}
             </span>
             {opt.text}
@@ -283,29 +296,29 @@ function QuestionView() {
       {feedback && (
         <div className="mt-4 text-center animate-scale-in">
           <div
-            className={`text-lg font-semibold ${feedback.correct ? "text-emerald-400" : "text-rose-400"}`}
+            className={`text-lg font-semibold ${feedback.correct ? "text-correct" : "text-wrong"}`}
           >
             {feedback.correct ? "Correct!" : "Incorrect"}
           </div>
           {feedback.correct && (
             <div className="relative">
-              <div className="text-zinc-300 font-medium text-base">
+              <div className="text-text-secondary font-medium text-base">
                 +{feedback.pointsAwarded.toLocaleString()} pts
               </div>
               {feedback.speedBonus > 0 && (
-                <div className="text-sm text-zinc-500">
+                <div className="text-sm text-text-muted">
                   Speed bonus: +{feedback.speedBonus}
                 </div>
               )}
               {pointsFly !== null && (
-                <div className="absolute left-1/2 -translate-x-1/2 -top-8 text-xl font-bold text-zinc-200 animate-points-fly pointer-events-none">
+                <div className="absolute left-1/2 -translate-x-1/2 -top-8 text-xl font-bold text-text-primary animate-points-fly pointer-events-none">
                   +{pointsFly.toLocaleString()}
                 </div>
               )}
             </div>
           )}
           {phase !== "revealed" && (
-            <div className="text-zinc-500 text-sm mt-2">Waiting for next question...</div>
+            <div className="text-text-muted text-sm mt-2">Waiting for next question...</div>
           )}
         </div>
       )}
@@ -313,8 +326,8 @@ function QuestionView() {
       {/* Time expired without answer */}
       {isExpired && !feedback && !selectedOptionId && (
         <div className="mt-4 text-center animate-scale-in">
-          <div className="text-lg font-semibold text-rose-400">Time&apos;s Up!</div>
-          <div className="text-zinc-500 text-sm mt-1">No answer submitted</div>
+          <div className="text-lg font-semibold text-wrong">Time&apos;s Up!</div>
+          <div className="text-text-muted text-sm mt-1">No answer submitted</div>
         </div>
       )}
     </div>
@@ -328,22 +341,18 @@ function FinishedView() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="text-3xl mb-3">&#127942;</div>
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 mb-2">Quiz Complete!</h1>
-      <p className="text-zinc-400 mb-6">{teamName}</p>
+      <h1 className="text-2xl font-semibold text-text-primary mb-2">Quiz Complete!</h1>
+      <p className="text-text-secondary mb-6">{teamName}</p>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 mb-6 w-full max-w-sm">
-        <div className="text-sm text-zinc-400 mb-1">Your Score</div>
-        <div className="text-4xl font-bold text-zinc-50">
+      <div className="card p-8 mb-6 w-full max-w-sm">
+        <div className="text-sm text-text-secondary mb-1">Your Score</div>
+        <div className="text-4xl font-bold text-text-primary">
           {totalScore.toLocaleString()}
         </div>
         {myRank && (
           <div className="mt-4">
-            <span className="text-3xl">
-              {myRank.rank === 1 ? "\u{1F947}" : myRank.rank === 2 ? "\u{1F948}" : myRank.rank === 3 ? "\u{1F949}" : ""}
-            </span>
-            <div className="text-base text-zinc-300">
-              Rank <span className="font-semibold text-zinc-50">#{myRank.rank}</span> of {leaderboard.length}
+            <div className="text-base text-text-secondary">
+              Rank <span className="font-semibold text-text-primary">#{myRank.rank}</span> of {leaderboard.length}
             </div>
           </div>
         )}
@@ -356,15 +365,15 @@ function FinishedView() {
             key={entry.teamId}
             className={`flex items-center justify-between px-4 py-3 rounded-xl ${
               entry.teamId === teamId
-                ? "bg-indigo-500/10 border border-indigo-500/20"
-                : "bg-zinc-900 border border-zinc-800"
+                ? "bg-accent/10 border border-accent/20"
+                : "card"
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-zinc-500 w-6">#{entry.rank}</span>
+              <span className="text-sm font-semibold text-text-muted w-6">#{entry.rank}</span>
               <span className="font-medium">{entry.name}</span>
             </div>
-            <span className="font-semibold text-zinc-50">{entry.score.toLocaleString()}</span>
+            <span className="font-semibold text-text-primary">{entry.score.toLocaleString()}</span>
           </div>
         ))}
       </div>
@@ -502,7 +511,7 @@ export default function PlayPage() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-zinc-400 animate-pulse">Loading...</div>
+        <div className="text-text-secondary animate-pulse">Loading...</div>
       </div>
     );
   }

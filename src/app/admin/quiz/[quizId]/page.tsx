@@ -152,7 +152,7 @@ export default function QuizEditorPage() {
   if (!quiz) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-zinc-400 animate-pulse">Loading...</div>
+        <div className="text-text-secondary animate-pulse">Loading...</div>
       </div>
     );
   }
@@ -164,20 +164,20 @@ export default function QuizEditorPage() {
         <div>
           <button
             onClick={() => router.push("/admin/dashboard")}
-            className="text-zinc-500 hover:text-zinc-300 text-sm mb-2 inline-block transition-colors"
+            className="text-text-muted hover:text-text-primary text-sm mb-2 inline-block transition-colors"
           >
             &larr; Back to Dashboard
           </button>
-          <h1 className="text-xl font-semibold tracking-tight">{quiz.title}</h1>
-          <p className="text-sm text-zinc-400">
-            Code: <span className="font-mono text-indigo-400 font-medium">{quiz.code}</span>
+          <h1 className="text-xl font-semibold">{quiz.title}</h1>
+          <p className="text-sm text-text-secondary">
+            Code: <span className="font-mono text-accent font-medium">{quiz.code}</span>
             {" | "}{questions.length} question{questions.length !== 1 ? "s" : ""}
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => router.push(`/admin/quiz/${quizId}/control`)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-accent hover:bg-accent-hover rounded-lg text-sm font-medium transition-colors"
           >
             Go Live
           </button>
@@ -189,17 +189,17 @@ export default function QuizEditorPage() {
         {questions.map((q, qIdx) => (
           <div
             key={qIdx}
-            className="bg-zinc-900 border border-zinc-800 rounded-xl p-5"
+            className="card p-5"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-zinc-400">
+              <h3 className="font-medium text-text-secondary">
                 Question {qIdx + 1}
               </h3>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => moveQuestion(qIdx, -1)}
                   disabled={qIdx === 0}
-                  className="p-1.5 text-zinc-500 hover:text-zinc-300 disabled:opacity-30 transition-colors"
+                  className="p-1.5 text-text-muted hover:text-text-primary disabled:opacity-30 transition-colors"
                   title="Move up"
                 >
                   &#9650;
@@ -207,7 +207,7 @@ export default function QuizEditorPage() {
                 <button
                   onClick={() => moveQuestion(qIdx, 1)}
                   disabled={qIdx === questions.length - 1}
-                  className="p-1.5 text-zinc-500 hover:text-zinc-300 disabled:opacity-30 transition-colors"
+                  className="p-1.5 text-text-muted hover:text-text-primary disabled:opacity-30 transition-colors"
                   title="Move down"
                 >
                   &#9660;
@@ -215,7 +215,7 @@ export default function QuizEditorPage() {
                 <button
                   onClick={() => removeQuestion(qIdx)}
                   disabled={questions.length <= 1}
-                  className="p-1.5 text-rose-400 hover:text-rose-300 disabled:opacity-30 ml-2 transition-colors"
+                  className="p-1.5 text-wrong hover:text-wrong/80 disabled:opacity-30 ml-2 transition-colors"
                   title="Remove question"
                 >
                   &#10005;
@@ -228,7 +228,7 @@ export default function QuizEditorPage() {
               onChange={(e) => updateQuestion(qIdx, { text: e.target.value })}
               placeholder="Enter your question..."
               rows={2}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 mb-4 resize-none transition-colors"
+              className="w-full px-4 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 mb-4 resize-none transition-colors"
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -238,8 +238,8 @@ export default function QuizEditorPage() {
                     onClick={() => setCorrectOption(qIdx, oIdx)}
                     className={`shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
                       opt.isCorrect
-                        ? "bg-emerald-600 border-emerald-400 text-white"
-                        : "border-zinc-700 text-zinc-500 hover:border-zinc-500"
+                        ? "bg-correct border-correct text-white"
+                        : "border-white/[0.12] text-text-muted hover:border-white/[0.25]"
                     }`}
                     title={opt.isCorrect ? "Correct answer" : "Mark as correct"}
                   >
@@ -252,7 +252,7 @@ export default function QuizEditorPage() {
                       updateOption(qIdx, oIdx, { text: e.target.value })
                     }
                     placeholder={`Option ${String.fromCharCode(65 + oIdx)}`}
-                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 text-sm transition-colors"
+                    className="flex-1 px-3 py-2 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 text-sm transition-colors"
                   />
                 </div>
               ))}
@@ -260,13 +260,13 @@ export default function QuizEditorPage() {
 
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <label className="text-zinc-400">Time:</label>
+                <label className="text-text-secondary">Time:</label>
                 <select
                   value={q.timeLimitSec}
                   onChange={(e) =>
                     updateQuestion(qIdx, { timeLimitSec: Number(e.target.value) })
                   }
-                  className="px-2 py-1 bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                  className="px-2 py-1 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors"
                 >
                   <option value={10}>10s</option>
                   <option value={15}>15s</option>
@@ -277,13 +277,13 @@ export default function QuizEditorPage() {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-zinc-400">Points:</label>
+                <label className="text-text-secondary">Points:</label>
                 <select
                   value={q.points}
                   onChange={(e) =>
                     updateQuestion(qIdx, { points: Number(e.target.value) })
                   }
-                  className="px-2 py-1 bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                  className="px-2 py-1 bg-surface-overlay border border-white/[0.08] rounded-lg text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors"
                 >
                   <option value={500}>500</option>
                   <option value={1000}>1000</option>
@@ -297,20 +297,20 @@ export default function QuizEditorPage() {
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 mt-6">
+      <div className="grid grid-cols-2 gap-3 mt-6">
         <button
           onClick={addQuestion}
-          className="flex-1 py-3 border-2 border-dashed border-zinc-700 hover:border-zinc-500 text-zinc-500 hover:text-zinc-300 rounded-xl font-medium transition-colors"
+          className="py-3 border-2 border-dashed border-white/[0.08] hover:border-white/[0.16] text-text-muted hover:text-text-primary rounded-xl font-medium transition-colors"
         >
           + Add Question
         </button>
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`flex-1 py-3 font-medium rounded-xl transition-all ${
+          className={`py-3 font-medium rounded-xl transition-colors ${
             saved
-              ? "bg-emerald-600 text-white"
-              : "bg-indigo-600 hover:bg-indigo-500 text-white"
+              ? "bg-correct text-white"
+              : "bg-accent hover:bg-accent-hover text-white"
           } disabled:opacity-50`}
         >
           {saving ? "Saving..." : saved ? "Saved!" : "Save Questions"}
