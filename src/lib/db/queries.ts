@@ -77,28 +77,29 @@ export function upsertQuestions(
   questionsData: Array<{
     id?: string;
     text: string;
-    orderNum: number;
+    orderNum?: number;
     timeLimitSec?: number;
     points?: number;
     options: Array<{
       id?: string;
       text: string;
       isCorrect: boolean;
-      orderNum: number;
+      orderNum?: number;
     }>;
   }>
 ) {
   // Delete existing questions (cascade deletes options)
   db.delete(questions).where(eq(questions.quizId, quizId)).run();
 
-  for (const q of questionsData) {
+  for (let qi = 0; qi < questionsData.length; qi++) {
+    const q = questionsData[qi];
     const qId = q.id || generateId();
     db.insert(questions)
       .values({
         id: qId,
         quizId,
         text: q.text,
-        orderNum: q.orderNum,
+        orderNum: q.orderNum ?? qi,
         timeLimitSec: q.timeLimitSec ?? 20,
         points: q.points ?? 1000,
       })
