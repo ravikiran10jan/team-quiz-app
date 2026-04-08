@@ -22,4 +22,4 @@ ENV NODE_ENV=production
 
 EXPOSE 3002
 
-CMD ["sh", "-c", "npx drizzle-kit push && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && node .next/standalone/server.js"]
+CMD ["sh", "-c", "npx drizzle-kit push && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && ln -sf /app/data .next/standalone/data && node .next/standalone/server.js"]
