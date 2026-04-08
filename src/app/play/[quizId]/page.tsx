@@ -292,42 +292,85 @@ function QuestionView() {
         ))}
       </div>
 
-      {/* Feedback overlay */}
-      {feedback && (
-        <div className="mt-4 text-center animate-scale-in">
-          <div
-            className={`text-lg font-semibold ${feedback.correct ? "text-correct" : "text-wrong"}`}
-          >
-            {feedback.correct ? "Correct!" : "Incorrect"}
-          </div>
-          {feedback.correct && (
-            <div className="relative">
-              <div className="text-text-secondary font-medium text-base">
-                +{feedback.pointsAwarded.toLocaleString()} pts
+      {/* Feedback banner — correct */}
+      {feedback && feedback.correct && (
+        <div className="mt-4 animate-scale-in">
+          <div className="relative rounded-xl bg-correct/10 border border-correct/20 p-5">
+            <div className="flex items-center gap-4">
+              <div className="shrink-0 w-12 h-12 rounded-full bg-correct/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-correct" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-              {feedback.speedBonus > 0 && (
-                <div className="text-sm text-text-muted">
-                  Speed bonus: +{feedback.speedBonus}
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-bold text-correct">Correct!</div>
+                <div className="text-text-secondary text-sm">
+                  +{feedback.pointsAwarded.toLocaleString()} points
+                  {feedback.speedBonus > 0 && (
+                    <span className="text-text-muted ml-2">(+{feedback.speedBonus} speed bonus)</span>
+                  )}
                 </div>
-              )}
-              {pointsFly !== null && (
-                <div className="absolute left-1/2 -translate-x-1/2 -top-8 text-xl font-bold text-text-primary animate-points-fly pointer-events-none">
-                  +{pointsFly.toLocaleString()}
-                </div>
-              )}
+              </div>
+              <div className="text-2xl font-bold text-correct shrink-0">
+                +{feedback.pointsAwarded.toLocaleString()}
+              </div>
             </div>
-          )}
+            {pointsFly !== null && (
+              <div className="absolute right-5 -top-6 text-xl font-bold text-correct animate-points-fly pointer-events-none">
+                +{pointsFly.toLocaleString()}
+              </div>
+            )}
+          </div>
           {phase !== "revealed" && (
-            <div className="text-text-muted text-sm mt-2">Waiting for next question...</div>
+            <div className="text-text-muted text-xs text-center mt-3">Waiting for next question...</div>
+          )}
+        </div>
+      )}
+
+      {/* Feedback banner — incorrect */}
+      {feedback && !feedback.correct && (
+        <div className="mt-4 animate-scale-in">
+          <div className="rounded-xl bg-wrong/10 border border-wrong/20 p-5">
+            <div className="flex items-center gap-4">
+              <div className="shrink-0 w-12 h-12 rounded-full bg-wrong/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-wrong" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-bold text-wrong">Incorrect</div>
+                <div className="text-text-secondary text-sm">
+                  The correct answer is highlighted above
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-wrong/60 shrink-0">
+                +0
+              </div>
+            </div>
+          </div>
+          {phase !== "revealed" && (
+            <div className="text-text-muted text-xs text-center mt-3">Waiting for next question...</div>
           )}
         </div>
       )}
 
       {/* Time expired without answer */}
       {isExpired && !feedback && !selectedOptionId && (
-        <div className="mt-4 text-center animate-scale-in">
-          <div className="text-lg font-semibold text-wrong">Time&apos;s Up!</div>
-          <div className="text-text-muted text-sm mt-1">No answer submitted</div>
+        <div className="mt-4 animate-scale-in">
+          <div className="rounded-xl bg-warning/10 border border-warning/20 p-5">
+            <div className="flex items-center gap-4">
+              <div className="shrink-0 w-12 h-12 rounded-full bg-warning/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                  <circle cx="12" cy="12" r="9" fill="none" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-bold text-warning">Time&apos;s Up!</div>
+                <div className="text-text-secondary text-sm">No answer submitted</div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
