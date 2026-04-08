@@ -108,7 +108,7 @@ export default function ControlPanelPage() {
   if (!quiz) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-gray-400 animate-pulse">Loading...</div>
+        <div className="text-zinc-400 animate-pulse">Loading...</div>
       </div>
     );
   }
@@ -118,6 +118,15 @@ export default function ControlPanelPage() {
   const isLastQuestion = currentIdx >= quiz.questions.length - 1;
   const quizStatus = state?.status ?? "waiting";
 
+  const statusBadge = () => {
+    switch (quizStatus) {
+      case "active": return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+      case "revealed": return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+      case "finished": return "bg-zinc-800 text-zinc-400 border border-zinc-700";
+      default: return "bg-zinc-800 text-zinc-400 border border-zinc-700";
+    }
+  };
+
   return (
     <div className="flex-1 p-4 sm:p-6 max-w-5xl mx-auto w-full">
       {/* Header */}
@@ -125,13 +134,13 @@ export default function ControlPanelPage() {
         <div>
           <button
             onClick={() => router.push("/admin/dashboard")}
-            className="text-gray-400 hover:text-white text-sm mb-1 inline-block transition-colors"
+            className="text-zinc-500 hover:text-zinc-300 text-sm mb-1 inline-block transition-colors"
           >
             &larr; Dashboard
           </button>
-          <h1 className="text-2xl font-bold">{quiz.title}</h1>
-          <div className="flex items-center gap-4 text-sm text-gray-400 mt-1">
-            <span>Code: <span className="font-mono text-amber-400 font-bold">{quiz.code}</span></span>
+          <h1 className="text-xl font-semibold tracking-tight">{quiz.title}</h1>
+          <div className="flex items-center gap-4 text-sm text-zinc-400 mt-1">
+            <span>Code: <span className="font-mono text-indigo-400 font-medium">{quiz.code}</span></span>
             <span>{teamCount} player{teamCount !== 1 ? "s" : ""} joined</span>
             <span>{quiz.questions.length} questions</span>
           </div>
@@ -139,7 +148,7 @@ export default function ControlPanelPage() {
         <a
           href={`/quiz/${quizId}/live`}
           target="_blank"
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg text-sm font-medium transition-colors"
         >
           Open Leaderboard &#8599;
         </a>
@@ -149,23 +158,18 @@ export default function ControlPanelPage() {
         {/* Control Panel */}
         <div className="lg:col-span-2 space-y-4">
           {/* Status Card */}
-          <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-6">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Quiz Control</h2>
-              <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
-                quizStatus === "waiting" ? "bg-gray-700 text-gray-300" :
-                quizStatus === "active" ? "bg-green-900 text-green-300" :
-                quizStatus === "revealed" ? "bg-amber-900 text-amber-300" :
-                "bg-purple-900 text-purple-300"
-              }`}>
+              <h2 className="text-lg font-medium">Quiz Control</h2>
+              <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${statusBadge()}`}>
                 {quizStatus}
               </span>
             </div>
 
             {/* Current question preview */}
             {currentQuestion && (
-              <div className="bg-gray-900 rounded-xl p-4 mb-4">
-                <div className="text-sm text-gray-400 mb-1">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 mb-4">
+                <div className="text-sm text-zinc-400 mb-1">
                   Question {currentIdx + 1} of {quiz.questions.length}
                 </div>
                 <div className="text-lg font-medium mb-3">{currentQuestion.text}</div>
@@ -175,8 +179,8 @@ export default function ControlPanelPage() {
                       key={opt.id}
                       className={`px-3 py-2 rounded-lg text-sm ${
                         opt.isCorrect
-                          ? "bg-green-900/50 border border-green-600 text-green-300"
-                          : "bg-gray-800 border border-gray-600 text-gray-400"
+                          ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
+                          : "bg-zinc-800 border border-zinc-700 text-zinc-500"
                       }`}
                     >
                       {opt.isCorrect && <span className="mr-1">&#10003;</span>}
@@ -193,7 +197,7 @@ export default function ControlPanelPage() {
                 <button
                   onClick={() => handleAction("start")}
                   disabled={acting || quiz.questions.length === 0}
-                  className="flex-1 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition-colors disabled:opacity-50 text-lg"
+                  className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50 text-base"
                 >
                   &#9654; Start Quiz
                 </button>
@@ -203,7 +207,7 @@ export default function ControlPanelPage() {
                 <button
                   onClick={() => handleAction("reveal")}
                   disabled={acting}
-                  className="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
+                  className="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
                 >
                   Reveal Answer
                 </button>
@@ -213,7 +217,7 @@ export default function ControlPanelPage() {
                 <button
                   onClick={() => handleAction("next_question")}
                   disabled={acting}
-                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
                 >
                   Next Question &rarr;
                 </button>
@@ -223,9 +227,9 @@ export default function ControlPanelPage() {
                 <button
                   onClick={() => handleAction("end")}
                   disabled={acting}
-                  className="flex-1 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
                 >
-                  &#127942; End Quiz
+                  End Quiz
                 </button>
               )}
 
@@ -233,34 +237,33 @@ export default function ControlPanelPage() {
                 <button
                   onClick={() => handleAction("end")}
                   disabled={acting}
-                  className="py-3 px-4 bg-red-900 hover:bg-red-800 text-red-300 font-medium rounded-xl transition-colors disabled:opacity-50 text-sm"
+                  className="py-3 px-4 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 font-medium rounded-lg transition-colors disabled:opacity-50 text-sm"
                 >
                   End Early
                 </button>
               )}
 
               {quizStatus === "finished" && (
-                <div className="flex-1 py-4 text-center text-gray-400">
-                  <div className="text-3xl mb-2">&#127942;</div>
-                  Quiz has ended! View the leaderboard for final results.
+                <div className="flex-1 py-4 text-center text-zinc-400">
+                  Quiz has ended. View the leaderboard for final results.
                 </div>
               )}
             </div>
           </div>
 
           {/* Question progress */}
-          <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-4">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">Question Progress</h3>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+            <h3 className="text-sm font-medium text-zinc-400 mb-3">Question Progress</h3>
             <div className="flex flex-wrap gap-2">
               {quiz.questions.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold transition-colors ${
                     idx === currentIdx
-                      ? "bg-purple-600 text-white ring-2 ring-purple-400"
+                      ? "bg-indigo-600 text-white ring-2 ring-indigo-500/40"
                       : idx < currentIdx
-                      ? "bg-green-900 text-green-300"
-                      : "bg-gray-700 text-gray-500"
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      : "bg-zinc-800 text-zinc-600"
                   }`}
                 >
                   {idx + 1}
@@ -271,10 +274,10 @@ export default function ControlPanelPage() {
         </div>
 
         {/* Leaderboard sidebar */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-4">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Live Rankings</h3>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+          <h3 className="text-sm font-medium text-zinc-400 mb-3">Live Rankings</h3>
           {leaderboard.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-zinc-500 text-sm">
               Rankings will appear once players start answering
             </div>
           ) : (
@@ -282,15 +285,15 @@ export default function ControlPanelPage() {
               {leaderboard.map((entry) => (
                 <div
                   key={entry.teamId}
-                  className="flex items-center justify-between px-3 py-2 bg-gray-900 rounded-lg"
+                  className="flex items-center justify-between px-3 py-2 bg-zinc-800/50 rounded-lg"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-sm font-bold text-gray-500 w-5 shrink-0">
+                    <span className="text-sm font-semibold text-zinc-500 w-5 shrink-0">
                       #{entry.rank}
                     </span>
                     <span className="font-medium truncate text-sm">{entry.name}</span>
                   </div>
-                  <span className="font-bold text-amber-400 text-sm shrink-0 ml-2">
+                  <span className="font-semibold text-zinc-50 text-sm shrink-0 ml-2">
                     {entry.score.toLocaleString()}
                   </span>
                 </div>

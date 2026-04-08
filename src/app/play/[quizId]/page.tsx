@@ -19,13 +19,13 @@ function ConfettiExplosion() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const colors = ["#8b5cf6", "#ec4899", "#f59e0b", "#22c55e", "#3b82f6", "#ef4444"];
-    const particles = Array.from({ length: 60 }, () => ({
+    const colors = ["#6366f1", "#34d399", "#38bdf8", "#fbbf24", "#a78bfa"];
+    const particles = Array.from({ length: 35 }, () => ({
       x: canvas.width / 2 + (Math.random() - 0.5) * 200,
       y: canvas.height / 2,
       vx: (Math.random() - 0.5) * 12,
       vy: -Math.random() * 15 - 5,
-      size: Math.random() * 8 + 3,
+      size: Math.random() * 5 + 2,
       color: colors[Math.floor(Math.random() * colors.length)],
       rotation: Math.random() * 360,
       rotSpeed: (Math.random() - 0.5) * 10,
@@ -76,12 +76,12 @@ function TimerRing({ fraction, timeLeft }: { fraction: number; timeLeft: number 
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - fraction);
   const color =
-    fraction > 0.5 ? "text-green-400" : fraction > 0.2 ? "text-yellow-400" : "text-red-400";
+    fraction > 0.5 ? "text-zinc-300" : fraction > 0.2 ? "text-amber-400" : "text-rose-400";
 
   return (
     <div className="relative flex items-center justify-center">
       <svg width="88" height="88" className="-rotate-90">
-        <circle cx="44" cy="44" r={radius} fill="none" stroke="#374151" strokeWidth="6" />
+        <circle cx="44" cy="44" r={radius} fill="none" stroke="#27272a" strokeWidth="6" />
         <circle
           cx="44"
           cy="44"
@@ -104,9 +104,8 @@ function TimerRing({ fraction, timeLeft }: { fraction: number; timeLeft: number 
 function StreakBadge({ streak }: { streak: number }) {
   if (streak < 2) return null;
   return (
-    <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-900/50 border border-amber-600 rounded-full animate-pulse-glow">
-      <span className="text-lg">&#128293;</span>
-      <span className="text-amber-300 font-bold">&times;{streak}</span>
+    <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full">
+      <span className="text-amber-400 font-medium text-sm">&times;{streak} streak</span>
     </div>
   );
 }
@@ -115,36 +114,23 @@ function StreakBadge({ streak }: { streak: number }) {
 function LobbyView({ playerName, playerCount, quizTitle }: { playerName: string; playerCount: number; quizTitle: string }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="text-5xl mb-6 animate-bounce">&#9889;</div>
-      <h1 className="text-3xl font-bold mb-2">{quizTitle}</h1>
-      <p className="text-gray-400 mb-8">Waiting for the host to start...</p>
+      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 mb-2">{quizTitle}</h1>
+      <p className="text-zinc-400 text-sm mb-8">Waiting for the host to start...</p>
 
-      <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-6 mb-6 w-full max-w-sm">
-        <p className="text-gray-400 text-sm">You</p>
-        <p className="text-2xl font-bold text-purple-400">{playerName}</p>
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-4 w-full max-w-sm">
+        <p className="text-zinc-500 text-xs uppercase tracking-wide">You</p>
+        <p className="text-xl font-semibold text-indigo-400">{playerName}</p>
       </div>
 
-      <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-6 w-full max-w-sm">
-        <p className="text-gray-400 text-sm">Players Joined</p>
-        <p className="text-4xl font-bold text-amber-400">{playerCount}</p>
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 w-full max-w-sm">
+        <p className="text-zinc-500 text-xs uppercase tracking-wide">Players Joined</p>
+        <p className="text-3xl font-bold text-zinc-50">{playerCount}</p>
       </div>
 
-      <div className="mt-8 flex gap-2">
-        <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-        <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-        <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-      </div>
+      <span className="mt-8 text-zinc-500 text-sm animate-pulse">Waiting for host to start...</span>
     </div>
   );
 }
-
-// ─── Option button colors ───
-const optionColors = [
-  { bg: "bg-red-600 hover:bg-red-500", selected: "bg-red-700 ring-2 ring-red-300", correct: "bg-green-600", wrong: "bg-red-900" },
-  { bg: "bg-blue-600 hover:bg-blue-500", selected: "bg-blue-700 ring-2 ring-blue-300", correct: "bg-green-600", wrong: "bg-blue-900" },
-  { bg: "bg-yellow-600 hover:bg-yellow-500", selected: "bg-yellow-700 ring-2 ring-yellow-300", correct: "bg-green-600", wrong: "bg-yellow-900" },
-  { bg: "bg-green-600 hover:bg-green-500", selected: "bg-green-700 ring-2 ring-green-300", correct: "bg-green-600", wrong: "bg-green-900" },
-];
 
 // ─── Question Phase ───
 function QuestionView() {
@@ -206,22 +192,38 @@ function QuestionView() {
 
   if (!currentQuestion) return null;
 
-  const getOptionStyle = (optionId: string, idx: number) => {
-    const colors = optionColors[idx % 4];
-
+  const getOptionStyle = (optionId: string) => {
+    // Revealed state
     if (feedback || correctOptionId) {
       if (optionId === (feedback?.correctOptionId ?? correctOptionId)) {
-        return `${colors.correct} ring-2 ring-green-300`;
+        return "bg-emerald-500/10 border-emerald-500 text-emerald-300";
       }
       if (optionId === selectedOptionId && !feedback?.correct) {
-        return `${colors.wrong} ring-2 ring-red-400 animate-shake`;
+        return "bg-rose-500/10 border-rose-500/50 text-zinc-400 animate-shake";
       }
-      return `${colors.bg} opacity-50`;
+      return "bg-zinc-800/80 border-zinc-800 opacity-40";
+    }
+    // Selected (pre-reveal)
+    if (optionId === selectedOptionId) {
+      return "bg-indigo-500/10 border-indigo-500/50 text-zinc-100";
+    }
+    // Default
+    return "bg-zinc-800/80 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-100";
+  };
+
+  const getBadgeStyle = (optionId: string) => {
+    if (feedback || correctOptionId) {
+      if (optionId === (feedback?.correctOptionId ?? correctOptionId)) {
+        return "bg-emerald-500/20 text-emerald-400";
+      }
+      if (optionId === selectedOptionId && !feedback?.correct) {
+        return "bg-rose-500/20 text-rose-400";
+      }
     }
     if (optionId === selectedOptionId) {
-      return `${colors.selected} opacity-70`;
+      return "bg-indigo-500/20 text-indigo-400";
     }
-    return colors.bg;
+    return "bg-zinc-700 text-zinc-400";
   };
 
   return (
@@ -231,22 +233,22 @@ function QuestionView() {
       {/* Header: score, streak, timer */}
       <div className="flex items-center justify-between mb-4">
         <div className="text-left">
-          <div className="text-sm text-gray-400">Score</div>
-          <div className="text-xl font-bold text-purple-400">{totalScore.toLocaleString()}</div>
+          <div className="text-xs text-zinc-500 uppercase tracking-wide">Score</div>
+          <div className="text-lg font-semibold text-zinc-50">{totalScore.toLocaleString()}</div>
         </div>
         <TimerRing fraction={fraction} timeLeft={timeLeft} />
         <div className="text-right">
           <StreakBadge streak={streak} />
-          <div className="text-sm text-gray-400 mt-1">
+          <div className="text-sm text-zinc-400 mt-1">
             Q{currentQuestion.questionIdx + 1}/{currentQuestion.totalQuestions}
           </div>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1.5 bg-gray-800 rounded-full mb-6 overflow-hidden">
+      <div className="h-1 bg-zinc-800 rounded-full mb-6 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"
+          className="h-full bg-indigo-500 rounded-full transition-all duration-300"
           style={{
             width: `${((currentQuestion.questionIdx + 1) / currentQuestion.totalQuestions) * 100}%`,
           }}
@@ -254,8 +256,8 @@ function QuestionView() {
       </div>
 
       {/* Question text */}
-      <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-6 mb-6">
-        <h2 className="text-xl font-bold text-center leading-relaxed">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-medium text-zinc-50 text-center leading-relaxed">
           {currentQuestion.text}
         </h2>
       </div>
@@ -267,9 +269,9 @@ function QuestionView() {
             key={opt.id}
             onClick={() => handleSelectOption(opt.id)}
             disabled={!!selectedOptionId || !!feedback || isExpired}
-            className={`relative w-full py-4 px-6 rounded-xl font-semibold text-lg text-white transition-all duration-200 active:scale-[0.97] disabled:cursor-default ${getOptionStyle(opt.id, idx)}`}
+            className={`relative w-full py-4 px-5 rounded-xl text-left font-medium text-base border transition-all duration-150 active:scale-[0.98] disabled:cursor-default ${getOptionStyle(opt.id)}`}
           >
-            <span className="mr-2 inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/20 text-sm font-bold">
+            <span className={`mr-3 inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-semibold ${getBadgeStyle(opt.id)}`}>
               {String.fromCharCode(65 + idx)}
             </span>
             {opt.text}
@@ -279,40 +281,40 @@ function QuestionView() {
 
       {/* Feedback overlay */}
       {feedback && (
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center animate-scale-in">
           <div
-            className={`text-2xl font-bold ${feedback.correct ? "text-green-400" : "text-red-400"}`}
+            className={`text-lg font-semibold ${feedback.correct ? "text-emerald-400" : "text-rose-400"}`}
           >
-            {feedback.correct ? "Correct!" : "Wrong!"}
+            {feedback.correct ? "Correct!" : "Incorrect"}
           </div>
           {feedback.correct && (
             <div className="relative">
-              <div className="text-amber-400 font-bold text-lg">
+              <div className="text-zinc-300 font-medium text-base">
                 +{feedback.pointsAwarded.toLocaleString()} pts
               </div>
               {feedback.speedBonus > 0 && (
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-zinc-500">
                   Speed bonus: +{feedback.speedBonus}
                 </div>
               )}
               {pointsFly !== null && (
-                <div className="absolute left-1/2 -translate-x-1/2 -top-8 text-3xl font-extrabold text-amber-300 animate-points-fly pointer-events-none">
+                <div className="absolute left-1/2 -translate-x-1/2 -top-8 text-xl font-bold text-zinc-200 animate-points-fly pointer-events-none">
                   +{pointsFly.toLocaleString()}
                 </div>
               )}
             </div>
           )}
           {phase !== "revealed" && (
-            <div className="text-gray-500 text-sm mt-2">Waiting for next question...</div>
+            <div className="text-zinc-500 text-sm mt-2">Waiting for next question...</div>
           )}
         </div>
       )}
 
       {/* Time expired without answer */}
       {isExpired && !feedback && !selectedOptionId && (
-        <div className="mt-4 text-center">
-          <div className="text-2xl font-bold text-red-400">Time&apos;s Up!</div>
-          <div className="text-gray-500 text-sm mt-1">No answer submitted</div>
+        <div className="mt-4 text-center animate-scale-in">
+          <div className="text-lg font-semibold text-rose-400">Time&apos;s Up!</div>
+          <div className="text-zinc-500 text-sm mt-1">No answer submitted</div>
         </div>
       )}
     </div>
@@ -326,22 +328,22 @@ function FinishedView() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="text-6xl mb-4">&#127942;</div>
-      <h1 className="text-3xl font-bold mb-2">Quiz Complete!</h1>
-      <p className="text-gray-400 mb-6">{teamName}</p>
+      <div className="text-3xl mb-3">&#127942;</div>
+      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 mb-2">Quiz Complete!</h1>
+      <p className="text-zinc-400 mb-6">{teamName}</p>
 
-      <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 mb-6 w-full max-w-sm">
-        <div className="text-sm text-gray-400 mb-1">Your Score</div>
-        <div className="text-5xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 mb-6 w-full max-w-sm">
+        <div className="text-sm text-zinc-400 mb-1">Your Score</div>
+        <div className="text-4xl font-bold text-zinc-50">
           {totalScore.toLocaleString()}
         </div>
         {myRank && (
           <div className="mt-4">
-            <span className="text-6xl">
+            <span className="text-3xl">
               {myRank.rank === 1 ? "\u{1F947}" : myRank.rank === 2 ? "\u{1F948}" : myRank.rank === 3 ? "\u{1F949}" : ""}
             </span>
-            <div className="text-lg text-gray-300">
-              Rank <span className="font-bold text-amber-400">#{myRank.rank}</span> of {leaderboard.length}
+            <div className="text-base text-zinc-300">
+              Rank <span className="font-semibold text-zinc-50">#{myRank.rank}</span> of {leaderboard.length}
             </div>
           </div>
         )}
@@ -354,15 +356,15 @@ function FinishedView() {
             key={entry.teamId}
             className={`flex items-center justify-between px-4 py-3 rounded-xl ${
               entry.teamId === teamId
-                ? "bg-purple-900/50 border border-purple-600"
-                : "bg-gray-800/50 border border-gray-700"
+                ? "bg-indigo-500/10 border border-indigo-500/20"
+                : "bg-zinc-900 border border-zinc-800"
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className="text-lg font-bold text-gray-400 w-6">#{entry.rank}</span>
+              <span className="text-sm font-semibold text-zinc-500 w-6">#{entry.rank}</span>
               <span className="font-medium">{entry.name}</span>
             </div>
-            <span className="font-bold text-amber-400">{entry.score.toLocaleString()}</span>
+            <span className="font-semibold text-zinc-50">{entry.score.toLocaleString()}</span>
           </div>
         ))}
       </div>
@@ -500,7 +502,7 @@ export default function PlayPage() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-2xl text-gray-400 animate-pulse">Loading...</div>
+        <div className="text-zinc-400 animate-pulse">Loading...</div>
       </div>
     );
   }
