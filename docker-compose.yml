@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      - ADMIN_PASSWORD=quizbattle2024
+    volumes:
+      - quiz-data:/app/data
+
+volumes:
+  quiz-data:
