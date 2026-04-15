@@ -174,19 +174,22 @@ export default function ControlPanelPage() {
                 </div>
                 <div className="text-lg font-medium mb-3">{currentQuestion.text}</div>
                 <div className="grid grid-cols-2 gap-2">
-                  {currentQuestion.options.map((opt) => (
-                    <div
-                      key={opt.id}
-                      className={`px-3 py-2 rounded-lg text-sm ${
-                        opt.isCorrect
-                          ? "bg-correct/10 border border-correct/20 text-correct"
-                          : "bg-surface-overlay border border-white/[0.06] text-text-muted"
-                      }`}
-                    >
-                      {opt.isCorrect && <span className="mr-1">&#10003;</span>}
-                      {opt.text}
-                    </div>
-                  ))}
+                  {currentQuestion.options.map((opt) => {
+                    const showCorrect = opt.isCorrect && (quizStatus === "revealed" || quizStatus === "finished");
+                    return (
+                      <div
+                        key={opt.id}
+                        className={`px-3 py-2 rounded-lg text-sm ${
+                          showCorrect
+                            ? "bg-correct/10 border border-correct/20 text-correct"
+                            : "bg-surface-overlay border border-white/[0.06] text-text-muted"
+                        }`}
+                      >
+                        {showCorrect && <span className="mr-1">&#10003;</span>}
+                        {opt.text}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
