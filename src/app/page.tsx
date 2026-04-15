@@ -88,8 +88,8 @@ export default function HomePage() {
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="QUIZ7K"
-                maxLength={6}
+                placeholder="Enter code shared by your admin"
+                maxLength={10}
                 required
                 className="w-full px-4 py-3 bg-surface-base border border-white/[0.08] rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 text-lg tracking-[0.3em] text-center font-mono uppercase transition-colors"
               />
