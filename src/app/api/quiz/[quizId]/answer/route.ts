@@ -7,6 +7,7 @@ import {
   submitResponse,
   getLeaderboard,
   getQuestionsWithOptions,
+  getQuestionResponses,
 } from "@/lib/db/queries";
 import { options } from "@/lib/db/schema";
 import { db } from "@/lib/db";
@@ -112,7 +113,8 @@ export async function POST(
 
   // Broadcast leaderboard update
   const leaderboard = getLeaderboard(quizId);
-  broadcast(quizId, "leaderboard:update", { rankings: leaderboard });
+  const questionStats = getQuestionResponses(questionId, quizId);
+  broadcast(quizId, "leaderboard:update", { rankings: leaderboard, questionStats });
 
   const correctOption = currentQ.options.find((o) => o.isCorrect);
 

@@ -17,7 +17,9 @@ export default function AdminDashboard() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [timePerQ, setTimePerQ] = useState(20);
+  const [customCode, setCustomCode] = useState("");
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
   const router = useRouter();
 
   const fetchQuizzes = async () => {
@@ -39,17 +41,25 @@ export default function AdminDashboard() {
     e.preventDefault();
     if (!newTitle.trim()) return;
     setCreating(true);
+    setCreateError("");
 
     try {
+      const body: Record<string, unknown> = { title: newTitle.trim(), timePerQuestion: timePerQ };
+      if (customCode.trim()) body.code = customCode.trim();
+
       const res = await fetch("/api/admin/quizzes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle.trim(), timePerQuestion: timePerQ }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const data = await res.json();
         setNewTitle("");
+        setCustomCode("");
         router.push(`/admin/quiz/${data.id}`);
+      } else {
+        const data = await res.json();
+        setCreateError(data.error || "Failed to create quiz");
       }
     } finally {
       setCreating(false);
@@ -107,6 +117,13 @@ export default function AdminDashboard() {
               <option value={60}>60s</option>
             </select>
           </div>
+          <input
+            type="text"
+            value={customCode}
+            onChange={(e) => { setCustomCode(e.target.value.toUpperCase()); setCreateError(""); }}
+            placeholder="Code (optional)"
+            className="w-36 px-3 py-3 bg-surface-overlay border border-white/[0.08] rounded-lg text-accent font-mono placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors"
+          />
           <button
             type="submit"
             disabled={creating || !newTitle.trim()}
@@ -115,6 +132,9 @@ export default function AdminDashboard() {
             + Create
           </button>
         </div>
+        {createError && (
+          <p className="text-wrong text-sm mt-2">{createError}</p>
+        )}
       </form>
 
       {/* Quiz list */}

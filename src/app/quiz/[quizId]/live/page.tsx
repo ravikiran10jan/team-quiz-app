@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuizSSE } from "@/hooks/use-quiz-sse";
 
@@ -59,6 +59,26 @@ export default function LiveLeaderboardPage() {
   }, []);
 
   useQuizSSE(quizId, handleSSE);
+
+  useEffect(() => {
+    const fetchInitial = async () => {
+      try {
+        const res = await fetch(`/api/quiz/${quizId}/live-state`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.leaderboard?.length) setLeaderboard(data.leaderboard);
+        if (data.teamCount) setTeamCount(data.teamCount);
+        if (data.state?.status) setQuizStatus(data.state.status);
+        if (data.currentQuestion) setCurrentQuestion(data.currentQuestion);
+        if (data.state?.status === "finished" && data.leaderboard?.length) {
+          setTimeout(() => setShowPodium(true), 500);
+        }
+      } catch {
+        // SSE will populate state
+      }
+    };
+    fetchInitial();
+  }, [quizId]);
 
   // Podium view for finished quiz
   if (showPodium && leaderboard.length > 0) {

@@ -32,7 +32,29 @@ export async function PUT(
   }
   const { quizId } = await params;
   const data = await request.json();
-  updateQuiz(quizId, data);
+
+  if (data.code !== undefined) {
+    const code = String(data.code).toUpperCase();
+    if (!/^[A-Z0-9]{3,10}$/.test(code)) {
+      return NextResponse.json(
+        { error: "Code must be 3-10 alphanumeric characters" },
+        { status: 400 }
+      );
+    }
+    data.code = code;
+  }
+
+  try {
+    updateQuiz(quizId, data);
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.includes("UNIQUE constraint failed")) {
+      return NextResponse.json(
+        { error: "This code is already in use" },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
   return NextResponse.json({ success: true });
 }
 

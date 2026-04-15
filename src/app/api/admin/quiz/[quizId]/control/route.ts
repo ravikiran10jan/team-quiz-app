@@ -5,6 +5,7 @@ import {
   updateQuizState,
   getQuestionsWithOptions,
   getLeaderboard,
+  getQuestionResponses,
   updateQuiz,
 } from "@/lib/db/queries";
 import { broadcast } from "@/lib/sse-manager";
@@ -89,10 +90,12 @@ export async function POST(
       if (currentQ) {
         const correctOption = currentQ.options.find((o) => o.isCorrect);
         const leaderboard = getLeaderboard(quizId);
+        const questionStats = getQuestionResponses(currentQ.id, quizId);
         broadcast(quizId, "question:revealed", {
           questionId: currentQ.id,
           correctOptionId: correctOption?.id,
           leaderboard,
+          questionStats,
         });
       }
       break;

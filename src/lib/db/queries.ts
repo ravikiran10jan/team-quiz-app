@@ -5,9 +5,9 @@ import { generateId, generateQuizCode } from "../quiz-code";
 
 // ─── Quiz CRUD ───
 
-export function createQuiz(title: string, timePerQuestion: number) {
+export function createQuiz(title: string, timePerQuestion: number, customCode?: string) {
   const id = generateId();
-  const code = generateQuizCode();
+  const code = customCode ?? generateQuizCode();
 
   db.insert(quizzes).values({ id, title, code, timePerQuestion }).run();
   db.insert(quizState).values({ quizId: id }).run();
@@ -33,13 +33,14 @@ export function getQuizByCode(code: string) {
 
 export function updateQuiz(
   id: string,
-  data: { title?: string; timePerQuestion?: number; status?: string }
+  data: { title?: string; timePerQuestion?: number; status?: string; code?: string }
 ) {
   const updates: Record<string, unknown> = {};
   if (data.title !== undefined) updates.title = data.title;
   if (data.timePerQuestion !== undefined)
     updates.timePerQuestion = data.timePerQuestion;
   if (data.status !== undefined) updates.status = data.status;
+  if (data.code !== undefined) updates.code = data.code;
 
   return db.update(quizzes).set(updates).where(eq(quizzes.id, id)).run();
 }
@@ -253,4 +254,36 @@ export function getQuestionResponseStats(questionId: string) {
 
   const total = stats.reduce((sum, s) => sum + s.count, 0);
   return { stats, total };
+}
+
+export function getQuestionResponses(questionId: string, quizId: string) {
+  const allTeams = getTeamsByQuiz(quizId);
+  const totalTeams = allTeams.length;
+
+  const answered = db
+    .select({
+      teamId: responses.teamId,
+      teamName: teams.name,
+      isCorrect: responses.isCorrect,
+      pointsAwarded: responses.pointsAwarded,
+    })
+    .from(responses)
+    .innerJoin(teams, eq(responses.teamId, teams.id))
+    .where(eq(responses.questionId, questionId))
+    .all();
+
+  const correct = answered
+    .filter((r) => r.isCorrect)
+    .map((r) => ({ teamName: r.teamName, pointsAwarded: r.pointsAwarded }));
+  const incorrect = answered
+    .filter((r) => !r.isCorrect)
+    .map((r) => ({ teamName: r.teamName }));
+
+  return {
+    correct,
+    incorrect,
+    noAnswerCount: totalTeams - answered.length,
+    totalTeams,
+    answeredCount: answered.length,
+  };
 }

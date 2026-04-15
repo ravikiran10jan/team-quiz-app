@@ -32,6 +32,14 @@ interface RankEntry {
   correctCount: number;
 }
 
+interface QuestionStats {
+  correct: Array<{ teamName: string; pointsAwarded: number }>;
+  incorrect: Array<{ teamName: string }>;
+  noAnswerCount: number;
+  totalTeams: number;
+  answeredCount: number;
+}
+
 export default function ControlPanelPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const router = useRouter();
@@ -39,6 +47,7 @@ export default function ControlPanelPage() {
   const [state, setState] = useState<QuizStateData | null>(null);
   const [leaderboard, setLeaderboard] = useState<RankEntry[]>([]);
   const [teamCount, setTeamCount] = useState(0);
+  const [questionStats, setQuestionStats] = useState<QuestionStats | null>(null);
   const [acting, setActing] = useState(false);
 
   useEffect(() => {
@@ -88,17 +97,21 @@ export default function ControlPanelPage() {
           currentQuestionIdx: d.questionIdx as number,
           questionStartedAt: d.startedAt as string,
         });
+        setQuestionStats(null);
         break;
       case "question:revealed":
         setState((prev) => prev ? { ...prev, status: "revealed" } : prev);
         if (d.leaderboard) setLeaderboard(d.leaderboard as RankEntry[]);
+        if (d.questionStats) setQuestionStats(d.questionStats as QuestionStats);
         break;
       case "leaderboard:update":
         if (d.rankings) setLeaderboard(d.rankings as RankEntry[]);
+        if (d.questionStats) setQuestionStats(d.questionStats as QuestionStats);
         break;
       case "quiz:ended":
         setState((prev) => prev ? { ...prev, status: "finished" } : prev);
         if (d.finalRankings) setLeaderboard(d.finalRankings as RankEntry[]);
+        setQuestionStats(null);
         break;
     }
   }, [quizId]);
@@ -191,6 +204,71 @@ export default function ControlPanelPage() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {/* Answer Stats */}
+            {questionStats && (quizStatus === "active" || quizStatus === "revealed") && (
+              <div className="bg-surface-overlay rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-text-secondary">Responses</h3>
+                  <span className="text-xs text-text-muted">
+                    {questionStats.answeredCount} / {questionStats.totalTeams} answered
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full h-1.5 bg-surface-base rounded-full mb-3 overflow-hidden">
+                  <div
+                    className="h-full bg-accent rounded-full transition-all duration-500"
+                    style={{ width: questionStats.totalTeams > 0 ? `${(questionStats.answeredCount / questionStats.totalTeams) * 100}%` : "0%" }}
+                  />
+                </div>
+
+                {/* Correct */}
+                {questionStats.correct.length > 0 && (
+                  <div className="mb-2">
+                    <div className="text-xs font-medium text-correct mb-1">
+                      Correct ({questionStats.correct.length})
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {questionStats.correct.map((t) => (
+                        <span
+                          key={t.teamName}
+                          className="px-2 py-0.5 bg-correct/10 border border-correct/20 text-correct rounded text-xs"
+                        >
+                          {t.teamName} +{t.pointsAwarded}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Incorrect */}
+                {questionStats.incorrect.length > 0 && (
+                  <div className="mb-2">
+                    <div className="text-xs font-medium text-wrong mb-1">
+                      Incorrect ({questionStats.incorrect.length})
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {questionStats.incorrect.map((t) => (
+                        <span
+                          key={t.teamName}
+                          className="px-2 py-0.5 bg-wrong/10 border border-wrong/20 text-wrong rounded text-xs"
+                        >
+                          {t.teamName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No answer */}
+                {questionStats.noAnswerCount > 0 && (
+                  <div className="text-xs text-text-muted">
+                    {questionStats.noAnswerCount} team{questionStats.noAnswerCount !== 1 ? "s" : ""} didn&apos;t answer
+                  </div>
+                )}
               </div>
             )}
 

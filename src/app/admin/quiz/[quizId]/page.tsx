@@ -50,6 +50,8 @@ export default function QuizEditorPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [editCode, setEditCode] = useState("");
+  const [codeError, setCodeError] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -57,6 +59,7 @@ export default function QuizEditorPage() {
       if (res.status === 401) { router.push("/admin"); return; }
       const data = await res.json();
       setQuiz(data);
+      setEditCode(data.code);
       if (data.questions.length > 0) {
         setQuestions(data.questions);
       } else {
@@ -130,6 +133,31 @@ export default function QuizEditorPage() {
     setSaved(false);
   };
 
+  const handleCodeSave = async () => {
+    setCodeError("");
+    const code = editCode.toUpperCase();
+    if (!/^[A-Z0-9]{3,10}$/.test(code)) {
+      setCodeError("3-10 alphanumeric characters required");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/quiz/${quizId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      if (res.ok) {
+        setQuiz((prev) => prev ? { ...prev, code } : prev);
+        setEditCode(code);
+      } else {
+        const data = await res.json();
+        setCodeError(data.error || "Failed to update code");
+      }
+    } catch {
+      setCodeError("Network error");
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -169,10 +197,27 @@ export default function QuizEditorPage() {
             &larr; Back to Dashboard
           </button>
           <h1 className="text-xl font-semibold">{quiz.title}</h1>
-          <p className="text-sm text-text-secondary">
-            Code: <span className="font-mono text-accent font-medium">{quiz.code}</span>
-            {" | "}{questions.length} question{questions.length !== 1 ? "s" : ""}
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-sm text-text-secondary">Code:</span>
+            <input
+              type="text"
+              value={editCode}
+              onChange={(e) => { setEditCode(e.target.value.toUpperCase()); setCodeError(""); }}
+              className="w-28 px-2 py-1 bg-surface-overlay border border-white/[0.08] rounded text-accent font-mono font-medium text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+            />
+            {editCode !== quiz.code && (
+              <button
+                onClick={handleCodeSave}
+                className="px-2 py-1 bg-accent hover:bg-accent-hover text-white text-xs rounded transition-colors"
+              >
+                Save
+              </button>
+            )}
+            {codeError && <span className="text-wrong text-xs">{codeError}</span>}
+            <span className="text-sm text-text-secondary">
+              | {questions.length} question{questions.length !== 1 ? "s" : ""}
+            </span>
+          </div>
         </div>
         <div className="flex gap-2">
           <button
